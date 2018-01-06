@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+//https://www.coursera.org/learn/cryptocurrency/discussions/weeks/1/threads/2lNMbbYREealvA6gwFIz4g
 public class MaxFeeTxHandler {
     /**
      *  finds a set of transactions with maximum total transaction fees -- i.e. maximize the sum over

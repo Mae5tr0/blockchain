@@ -73,16 +73,20 @@ public class TxHandler {
      * updating the current UTXO pool as appropriate.
      */
     public Transaction[] handleTxs(Transaction[] possibleTxs) {
-        //simple filter valid transactions
         List<Transaction> result = new ArrayList<>();
         for (Transaction tx : possibleTxs) {
             if (isValidTx(tx)) {
                 result.add(tx);
+                for (Transaction.Input input : tx.getInputs()) {
+                    UTXO utxo = new UTXO(input.prevTxHash, input.outputIndex);
+                    pool.removeUTXO(utxo);
+                }
+                for (int index = 0; index < tx.getOutputs().size(); index++) {
+                    UTXO utxo = new UTXO(tx.getHash(), index);
+                    pool.addUTXO(utxo, tx.getOutput(index));
+                }
             }
         }
-        //check for mutually valid array of accepted transactions
-
-        //update UTXO pool
 
         return result.toArray(new Transaction[result.size()]);
     }
