@@ -9,20 +9,25 @@ import java.util.Random;
 import java.util.Set;
 import java.util.HashMap;
 
+//https://www.coursera.org/learn/cryptocurrency/discussions/weeks/4/threads/09H3eJZcEeeNexIKzDOQDA
+//https://www.coursera.org/learn/cryptocurrency/discussions/weeks/4/threads/jaqr13AmEeei2A4K_5_JHA
 public class Simulation {
 
    public static void main(String[] args) {
 
-      // There are four required command line arguments: p_graph (.1, .2, .3),
-      // p_malicious (.15, .30, .45), p_txDistribution (.01, .05, .10), 
-      // and numRounds (10, 20). You should try to test your CompliantNode
-      // code for all 3x3x3x2 = 54 combinations.
+      //Autograder test cases
+//      runSimulation(.1, .3, .01, 7);
+//      runSimulation(.1, .3, .05, 7);
+//      runSimulation(.1, .45, .01, 10);
+//      runSimulation(.1, .45, .05, 10);
+//      runSimulation(.2, .3, .01, 10);
+//      runSimulation(.2, .3, .05, 10);
+//      runSimulation(.2, .45, .01, 10);
+      runSimulation(.2, .45, .05, 10);
+   }
 
+   private static void runSimulation(double p_graph, double p_malicious, double p_txDistribution, int numRounds) {
       int numNodes = 100;
-      double p_graph = Double.parseDouble(args[0]); // parameter for random graph: prob. that an edge will exist
-      double p_malicious = Double.parseDouble(args[1]); // prob. that a node will be set to be malicious
-      double p_txDistribution = Double.parseDouble(args[2]); // probability of assigning an initial transaction to each node 
-      int numRounds = Integer.parseInt(args[3]); // number of simulation rounds your nodes will run for
 
       // pick which nodes are malicious and which are compliant
       Node[] nodes = new Node[numNodes];
@@ -93,10 +98,10 @@ public class Simulation {
                   if(!followees[j][i]) continue; // tx only matters if j follows i
 
                   if (!allProposals.containsKey(j)) {
-                	  Set<Candidate> candidates = new HashSet<>();
-                	  allProposals.put(j, candidates);
+                     Set<Candidate> candidates = new HashSet<>();
+                     allProposals.put(j, candidates);
                   }
-                  
+
                   Candidate candidate = new Candidate(tx, i);
                   allProposals.get(j).add(candidate);
                }
@@ -111,18 +116,45 @@ public class Simulation {
          }
       }
 
-      // print results
-      for (int i = 0; i < numNodes; i++) {
-         Set<Transaction> transactions = nodes[i].sendToFollowers();
-         System.out.println("Transaction ids that Node " + i + " believes consensus on:");
-         for (Transaction tx : transactions)
-            System.out.println(tx.id);
-         System.out.println();
-         System.out.println();
+
+      int compliantNodeCount = 0;
+      int consensusCount = 0;
+      Set<Transaction> consensus = null;
+
+      int i = 0;
+      int j = nodes.length - 1;
+
+      while (true) {
+         if (i >= j) break;
+
+         if (nodes[i].sendToFollowers().equals(nodes[j].sendToFollowers())) {
+            consensus = nodes[i].sendToFollowers();
+         }
+
+         i++;
+         j--;
       }
 
+      if (consensus == null) {
+         System.out.println("Consensus not found");
+         return;
+      }
+
+      for (Node node : nodes) {
+         if (node.getClass() == CompliantNode.class) {
+            compliantNodeCount++;
+
+            if (node.sendToFollowers().equals(consensus)) {
+               consensusCount++;
+            }
+         }
+      }
+
+      System.out.println("Valid nodes:" + compliantNodeCount);
+
+
+      System.out.println("On average " + consensusCount + " out of " + compliantNodeCount + " of nodes reach consensus");
+      System.out.println("Consensus length: " + consensus.size());
    }
-
-
 }
 
