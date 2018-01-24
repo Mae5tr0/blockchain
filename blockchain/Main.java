@@ -77,7 +77,7 @@ public class Main {
          */
         Block block3 = new Block(block1.getHash(), pk_scrooge.getPublic());
 
-        // new TX: alice pays 15 coins to bob
+        // new TX: alice pays 20 coins to bob
         Tx tx3 = new Tx();
         tx3.addOutput(20, pk_bob.getPublic());
         tx3.addInput(tx1.getHash(), 1);    // 10 coins
